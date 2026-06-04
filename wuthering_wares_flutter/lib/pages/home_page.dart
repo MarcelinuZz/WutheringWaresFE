@@ -9,11 +9,12 @@ import '../utils/constants.dart';
 import '../widgets/bottom_nav.dart';
 import '../widgets/brand_header.dart';
 import 'admin_catalog_page.dart';
+import 'cart_page.dart';
 import 'catalog_page.dart';
 import 'item_detail_page.dart';
 import 'item_form_page.dart';
+import 'payment_page.dart';
 import 'profile_page.dart';
-import 'simple_page.dart';
 
 enum MainTab { catalog, payment, cart, profile }
 
@@ -214,6 +215,12 @@ class HomePageState extends State<HomePage> {
         item: _detailItem!,
         adminMode: _isAdmin,
         onBack: () => setState(() => _detailItem = null),
+        onCartAdded: () => setState(() {
+          _detailItem = null;
+          _tab = MainTab.catalog;
+        }),
+        onTokenInvalid: widget.onTokenInvalid,
+        showMessage: widget.showMessage,
       );
     }
     return Scaffold(
@@ -305,13 +312,13 @@ class HomePageState extends State<HomePage> {
         items: _visibleItems,
         onDetail: (item) => setState(() => _detailItem = item),
       ),
-      MainTab.payment => const SimplePage(
-        title: 'Pembayaran',
-        description: 'Riwayat dan status pembayaran akan ditampilkan di sini.',
+      MainTab.cart => CartPage(
+        onTokenInvalid: widget.onTokenInvalid,
+        showMessage: widget.showMessage,
       ),
-      MainTab.cart => const SimplePage(
-        title: 'Keranjang',
-        description: 'Item yang dipilih akan masuk ke halaman keranjang.',
+      MainTab.payment => PaymentPage(
+        onTokenInvalid: widget.onTokenInvalid,
+        showMessage: widget.showMessage,
       ),
       MainTab.profile => ProfilePage(
         user: _user,

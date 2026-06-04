@@ -11,3 +11,9 @@ String formatRupiah(int value) {
 
 String titleCase(String value) =>
     value.isEmpty ? value : value[0].toUpperCase() + value.substring(1);
+
+String typeLabel(String value) => switch (value.toLowerCase()) {
+  'equipment' => 'Peralatan',
+  'supplies' => 'Persediaan',
+  _ => titleCase(value),
+};

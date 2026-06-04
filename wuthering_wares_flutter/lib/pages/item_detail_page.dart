@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../apis/api.dart';
 import '../models/catalog_item.dart';
+import '../utils/auth_store.dart';
 import '../utils/colors.dart';
 import '../utils/constants.dart';
 import '../utils/formatters.dart';
@@ -13,11 +15,17 @@ class ItemDetailPage extends StatefulWidget {
     required this.item,
     required this.adminMode,
     required this.onBack,
+    required this.onCartAdded,
+    required this.onTokenInvalid,
+    required this.showMessage,
   });
 
   final CatalogItem item;
   final bool adminMode;
   final VoidCallback onBack;
+  final VoidCallback onCartAdded;
+  final VoidCallback onTokenInvalid;
+  final void Function(String message, {required bool success}) showMessage;
 
   @override
   State<ItemDetailPage> createState() => _ItemDetailPageState();
@@ -25,6 +33,37 @@ class ItemDetailPage extends StatefulWidget {
 
 class _ItemDetailPageState extends State<ItemDetailPage> {
   int _quantity = 1;
+  bool _adding = false;
+
+  Future<void> _addToCart() async {
+    final token = await AuthStore.token;
+    if (token == null) {
+      _tokenInvalid();
+      return;
+    }
+    setState(() => _adding = true);
+    final result = await Api.addToCart(token, widget.item.id, _quantity);
+    if (!mounted) return;
+    setState(() => _adding = false);
+    if (result.message == tokenMissingMessage) {
+      _tokenInvalid();
+      return;
+    }
+    widget.showMessage(
+      result.message.isEmpty
+          ? (result.success
+                ? 'Item berhasil ditambahkan ke keranjang.'
+                : 'Gagal menambahkan item ke keranjang.')
+          : result.message,
+      success: result.success,
+    );
+    if (result.success) widget.onCartAdded();
+  }
+
+  void _tokenInvalid() {
+    widget.showMessage(tokenMissingMessage, success: false);
+    widget.onTokenInvalid();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +122,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
               const SizedBox(height: 22),
               DetailRow(label: 'ID Item', value: item.id),
               DetailRow(label: 'Nama', value: item.name),
-              DetailRow(label: 'Tipe', value: titleCase(item.type)),
+              DetailRow(label: 'Tipe', value: typeLabel(item.type)),
               DetailRow(label: 'Stok', value: '${item.stock} Unit'),
               DetailRow(label: 'Harga', value: formatRupiah(item.price)),
               DetailRow(
@@ -148,8 +187,8 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                 PrimaryActionButton(
                   text:
                       'TAMBAH KE KERANJANG (${formatRupiah(item.price * _quantity)})',
-                  loading: false,
-                  onPressed: () {},
+                  loading: _adding,
+                  onPressed: _addToCart,
                 ),
               ],
             ],
@@ -214,7 +253,7 @@ class RarityText extends StatelessWidget {
       _ => AppColors.textPrimary,
     };
     return Text(
-      '$rarity Star',
+      '$rarity Bintang',
       style: TextStyle(color: color, fontSize: 17, fontWeight: FontWeight.w800),
     );
   }

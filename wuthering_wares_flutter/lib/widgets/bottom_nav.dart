@@ -73,9 +73,9 @@ class NavItem extends StatelessWidget {
     };
     final label = switch (tab) {
       MainTab.catalog => 'KATALOG',
-      MainTab.payment => 'PAYMENT',
-      MainTab.cart => 'CART',
-      MainTab.profile => 'PROFILE',
+      MainTab.payment => 'BAYAR',
+      MainTab.cart => 'KERANJANG',
+      MainTab.profile => 'PROFIL',
     };
     return InteractiveSurface(
       onTap: onTap,

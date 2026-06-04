@@ -26,6 +26,8 @@ class WutheringWaresApp extends StatefulWidget {
 
 class _WutheringWaresAppState extends State<WutheringWaresApp> {
   final _messengerKey = GlobalKey<ScaffoldMessengerState>();
+  final _navigatorKey = GlobalKey<NavigatorState>();
+  OverlayEntry? _messageEntry;
   AppPage _page = AppPage.login;
   MainTab _initialHomeTab = MainTab.catalog;
   int _bindRefreshKey = 0;
@@ -122,12 +124,68 @@ class _WutheringWaresAppState extends State<WutheringWaresApp> {
 
   void _showMessage(String message, {required bool success}) {
     if (!mounted) return;
-    _messengerKey.currentState?.showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: success ? AppColors.success : AppColors.error,
-      ),
+    final context = _navigatorKey.currentContext;
+    if (context == null) return;
+    _messageEntry?.remove();
+    final color = success ? AppColors.success : AppColors.error;
+    final entry = OverlayEntry(
+      builder: (context) {
+        final top = MediaQuery.of(context).padding.top + 12;
+        return Positioned(
+          top: top,
+          left: 16,
+          right: 16,
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: AppColors.panel,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: color.withValues(alpha: 0.8)),
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withValues(alpha: 0.18),
+                    blurRadius: 24,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    success ? Icons.check_circle_outline : Icons.error_outline,
+                    color: color,
+                    size: 22,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      message,
+                      style: TextStyle(
+                        color: color,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        height: 1.35,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
+    _messageEntry = entry;
+    Overlay.of(context).insert(entry);
+    Future.delayed(const Duration(seconds: 3), () {
+      if (_messageEntry == entry) {
+        _messageEntry?.remove();
+        _messageEntry = null;
+      }
+    });
   }
 
   Future<void> _logoutLocal() async {
@@ -139,6 +197,7 @@ class _WutheringWaresAppState extends State<WutheringWaresApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: _navigatorKey,
       scaffoldMessengerKey: _messengerKey,
       debugShowCheckedModeBanner: false,
       title: 'Wuthering Wares',

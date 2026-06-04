@@ -94,8 +94,8 @@ class CatalogPage extends StatelessWidget {
 
 enum ItemFilter {
   all('Semua', null),
-  equipment('Equipment', 'equipment'),
-  supplies('Supplies', 'supplies');
+  equipment('Peralatan', 'equipment'),
+  supplies('Persediaan', 'supplies');
 
   const ItemFilter(this.label, this.type);
   final String label;
@@ -240,7 +240,7 @@ class ItemCard extends StatelessWidget {
             ),
             const SizedBox(height: 5),
             Text(
-              titleCase(item.type),
+              typeLabel(item.type),
               style: const TextStyle(color: AppColors.textSecondary),
             ),
             const Spacer(),

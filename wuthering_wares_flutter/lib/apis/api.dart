@@ -20,6 +20,13 @@ class Api {
   static Future<ApiResponse> bind(String token, String provider, String bindCode) => _post('/users/bind/$provider', {'bind_code': bindCode}, token: token);
   static Future<ApiResponse> unbind(String token, String provider) => _delete('/users/unbind/$provider', token);
   static Future<ApiResponse> deleteItem(String token, String id) => _delete('/items/$id', token);
+  static Future<ApiResponse> addToCart(String token, String itemId, int quantity) => _post('/cart/', {'item_id': itemId, 'quantity': quantity}, token: token);
+  static Future<ApiResponse> cart(String token) => _get('/cart/', token: token);
+  static Future<ApiResponse> updateCartQuantity(String token, String cartId, int quantity) => _patch('/cart/$cartId', {'quantity': quantity}, token);
+  static Future<ApiResponse> deleteCartItem(String token, String cartId) => _delete('/cart/$cartId', token);
+  static Future<ApiResponse> checkout(String token) => _post('/orders/checkout/', const {}, token: token);
+  static Future<ApiResponse> orders(String token) => _get('/orders/orders', token: token);
+  static Future<ApiResponse> orderDetail(String token, String orderId) => _get('/orders/orders/$orderId', token: token);
 
   static Future<ApiResponse> addItem(String token, ItemPayload payload) => _multipart('/items/', token, payload);
   static Future<ApiResponse> updateItem(String token, String id, ItemPayload payload) => _multipart('/items/$id', token, payload, method: 'PUT');
@@ -66,6 +73,7 @@ class Api {
     return ApiResponse(
       success: json['success'] == true,
       message: json['message']?.toString() ?? '',
+      data: dataJson,
       token: json['token']?.toString(),
       expiresAt: json['expires_at']?.toString(),
       user: userJson is Map<String, dynamic> ? User.fromJson(userJson) : null,
