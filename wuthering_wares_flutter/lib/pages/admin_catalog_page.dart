@@ -4,6 +4,7 @@ import '../models/catalog_item.dart';
 import '../utils/colors.dart';
 import '../utils/constants.dart';
 import '../utils/formatters.dart';
+import '../widgets/interactive_surface.dart';
 import '../widgets/status_text.dart';
 import 'catalog_page.dart';
 
@@ -139,16 +140,15 @@ class AdminItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return InteractiveSurface(
       onTap: onDetail,
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: 18,
+      baseColor: AppColors.panel,
+      hoverColor: AppColors.panel.withValues(alpha: 0.96),
+      borderColor: AppColors.stroke,
+      hoverBorderColor: AppColors.cyan.withValues(alpha: 0.72),
       child: Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: AppColors.panel,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppColors.stroke),
-        ),
         child: Column(
           children: [
             Row(

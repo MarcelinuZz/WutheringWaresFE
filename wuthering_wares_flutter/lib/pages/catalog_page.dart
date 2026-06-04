@@ -4,6 +4,7 @@ import '../models/catalog_item.dart';
 import '../utils/colors.dart';
 import '../utils/constants.dart';
 import '../utils/formatters.dart';
+import '../widgets/interactive_surface.dart';
 import '../widgets/status_text.dart';
 
 class CatalogPage extends StatelessWidget {
@@ -73,7 +74,7 @@ class CatalogPage extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 104),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  childAspectRatio: 0.72,
+                  childAspectRatio: 0.68,
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 18,
                 ),
@@ -115,22 +116,21 @@ class FilterPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(15),
+    return InteractiveSurface(
       onTap: onTap,
+      borderRadius: 15,
+      baseColor: selected
+          ? AppColors.cyan.withValues(alpha: 0.12)
+          : AppColors.panel,
+      hoverColor: selected
+          ? AppColors.cyan.withValues(alpha: 0.18)
+          : AppColors.stroke.withValues(alpha: 0.7),
+      borderColor: selected ? AppColors.cyan : AppColors.stroke,
+      hoverBorderColor: AppColors.cyan,
       child: Container(
         height: 48,
         padding: const EdgeInsets.symmetric(horizontal: 22),
         alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: selected
-              ? AppColors.cyan.withValues(alpha: 0.12)
-              : AppColors.panel,
-          borderRadius: BorderRadius.circular(15),
-          border: Border.all(
-            color: selected ? AppColors.cyan : AppColors.stroke,
-          ),
-        ),
         child: Text(
           text,
           style: TextStyle(
@@ -182,16 +182,16 @@ class ItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final image = item.image == null ? null : '$apiBase${item.image}';
-    return InkWell(
-      borderRadius: BorderRadius.circular(18),
+    return InteractiveSurface(
       onTap: onTap,
+      borderRadius: 18,
+      baseColor: AppColors.panel,
+      hoverColor: AppColors.panel.withValues(alpha: 0.96),
+      borderColor: AppColors.stroke.withValues(alpha: 0.7),
+      hoverBorderColor: AppColors.cyan.withValues(alpha: 0.72),
+      shadowColor: AppColors.cyan,
       child: Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: AppColors.panel,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppColors.stroke.withValues(alpha: 0.7)),
-        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -244,13 +244,39 @@ class ItemCard extends StatelessWidget {
               style: const TextStyle(color: AppColors.textSecondary),
             ),
             const Spacer(),
-            Text(
-              formatRupiah(item.price),
-              style: const TextStyle(
-                color: AppColors.cyan,
-                fontSize: 16,
-                fontWeight: FontWeight.w900,
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    formatRupiah(item.price),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: AppColors.cyan,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Container(
+                  width: 28,
+                  height: 28,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: AppColors.cyan.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: AppColors.cyan.withValues(alpha: 0.35),
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.chevron_right,
+                    color: AppColors.cyan,
+                    size: 18,
+                  ),
+                ),
+              ],
             ),
           ],
         ),

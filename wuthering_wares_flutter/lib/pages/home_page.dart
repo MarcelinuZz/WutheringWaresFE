@@ -51,6 +51,10 @@ class HomePageState extends State<HomePage> {
   String? _error;
 
   bool get _isAdmin => _user?.role == 'admin';
+  List<MainTab> get _availableTabs =>
+      _isAdmin ? const [MainTab.catalog, MainTab.profile] : MainTab.values;
+  MainTab get _effectiveTab =>
+      _availableTabs.contains(_tab) ? _tab : MainTab.catalog;
 
   @override
   void initState() {
@@ -67,7 +71,12 @@ class HomePageState extends State<HomePage> {
       loadUser();
     }
     if (widget.initialTab != oldWidget.initialTab) {
-      setState(() => _tab = widget.initialTab);
+      setState(() {
+        _tab = widget.initialTab;
+        if (!_availableTabs.contains(_tab)) {
+          _tab = MainTab.catalog;
+        }
+      });
     }
   }
 
@@ -81,7 +90,12 @@ class HomePageState extends State<HomePage> {
     if (!mounted) return;
     setState(() => _loadingUser = false);
     if (result.success && result.user != null) {
-      setState(() => _user = result.user);
+      setState(() {
+        _user = result.user;
+        if (_isAdmin && !_availableTabs.contains(_tab)) {
+          _tab = MainTab.catalog;
+        }
+      });
       return;
     }
     _handleApiMessage(
@@ -204,7 +218,8 @@ class HomePageState extends State<HomePage> {
     }
     return Scaffold(
       bottomNavigationBar: BottomNav(
-        selected: _tab,
+        selected: _effectiveTab,
+        tabs: _availableTabs,
         onSelected: (tab) => setState(() => _tab = tab),
       ),
       body: SafeArea(
@@ -226,7 +241,29 @@ class HomePageState extends State<HomePage> {
               ],
               if (_tab == MainTab.catalog && !_isAdmin)
                 const SizedBox(height: 20),
-              Expanded(child: _buildTab()),
+              Expanded(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 220),
+                  switchInCurve: Curves.easeOutCubic,
+                  switchOutCurve: Curves.easeInCubic,
+                  transitionBuilder: (child, animation) {
+                    final offset = Tween<Offset>(
+                      begin: const Offset(0.03, 0),
+                      end: Offset.zero,
+                    ).animate(animation);
+                    return FadeTransition(
+                      opacity: animation,
+                      child: SlideTransition(position: offset, child: child),
+                    );
+                  },
+                  child: KeyedSubtree(
+                    key: ValueKey(
+                      '${_isAdmin ? 'admin' : 'user'}-$_effectiveTab',
+                    ),
+                    child: _buildTab(),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -235,7 +272,8 @@ class HomePageState extends State<HomePage> {
   }
 
   Widget _buildTab() {
-    if (_isAdmin && _tab == MainTab.catalog) {
+    final tab = _effectiveTab;
+    if (_isAdmin && tab == MainTab.catalog) {
       return AdminCatalogPage(
         filter: _filter,
         onFilter: (filter) {
@@ -253,7 +291,7 @@ class HomePageState extends State<HomePage> {
         onDetail: (item) => setState(() => _detailItem = item),
       );
     }
-    return switch (_tab) {
+    return switch (tab) {
       MainTab.catalog => CatalogPage(
         filter: _filter,
         onFilter: (filter) {

@@ -7,6 +7,7 @@ import '../utils/colors.dart';
 import '../utils/constants.dart';
 import '../utils/native_bridge.dart';
 import '../widgets/action_buttons.dart';
+import '../widgets/interactive_surface.dart';
 import '../widgets/terminal_field.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -343,17 +344,16 @@ class ActionRow extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => InkWell(
+  Widget build(BuildContext context) => InteractiveSurface(
     onTap: onTap,
-    borderRadius: BorderRadius.circular(10),
+    borderRadius: 10,
+    baseColor: AppColors.panel,
+    hoverColor: AppColors.stroke.withValues(alpha: 0.7),
+    borderColor: AppColors.stroke,
+    hoverBorderColor: AppColors.cyan.withValues(alpha: 0.72),
     child: Container(
       height: 58,
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: AppColors.panel,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.stroke),
-      ),
       child: Row(
         children: [
           Icon(icon, color: AppColors.textSecondary),

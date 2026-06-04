@@ -20,13 +20,26 @@ class PrimaryActionButton extends StatelessWidget {
       height: 58,
       child: ElevatedButton(
         onPressed: loading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.cyan,
-          foregroundColor: Colors.black,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-        ),
+        style:
+            ElevatedButton.styleFrom(
+              backgroundColor: AppColors.cyan,
+              foregroundColor: Colors.black,
+              elevation: 0,
+              shadowColor: AppColors.cyan.withValues(alpha: 0.35),
+              animationDuration: const Duration(milliseconds: 180),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ).copyWith(
+              elevation: WidgetStateProperty.resolveWith(
+                (states) => states.contains(WidgetState.hovered) ? 5 : 0,
+              ),
+              overlayColor: WidgetStateProperty.resolveWith(
+                (states) => states.contains(WidgetState.pressed)
+                    ? Colors.black.withValues(alpha: 0.18)
+                    : Colors.white.withValues(alpha: 0.08),
+              ),
+            ),
         child: loading
             ? const SizedBox(
                 width: 22,
@@ -69,13 +82,26 @@ class SecondaryActionButton extends StatelessWidget {
         onPressed: onPressed,
         icon: Icon(icon, size: 24),
         label: Text(text),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.textPrimary,
-          side: const BorderSide(color: AppColors.stroke),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-        ),
+        style:
+            OutlinedButton.styleFrom(
+              foregroundColor: AppColors.textPrimary,
+              side: const BorderSide(color: AppColors.stroke),
+              animationDuration: const Duration(milliseconds: 180),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ).copyWith(
+              side: WidgetStateProperty.resolveWith(
+                (states) => BorderSide(
+                  color: states.contains(WidgetState.hovered)
+                      ? AppColors.cyan
+                      : AppColors.stroke,
+                ),
+              ),
+              overlayColor: WidgetStateProperty.all(
+                AppColors.cyan.withValues(alpha: 0.08),
+              ),
+            ),
       ),
     );
   }

@@ -5,9 +5,15 @@ import '../utils/colors.dart';
 import '../utils/constants.dart';
 import '../utils/formatters.dart';
 import '../widgets/action_buttons.dart';
+import '../widgets/interactive_surface.dart';
 
 class ItemDetailPage extends StatefulWidget {
-  const ItemDetailPage({super.key, required this.item, required this.adminMode, required this.onBack});
+  const ItemDetailPage({
+    super.key,
+    required this.item,
+    required this.adminMode,
+    required this.onBack,
+  });
 
   final CatalogItem item;
   final bool adminMode;
@@ -27,27 +33,127 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(22, 18, 22, 28),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            TextButton.icon(onPressed: widget.onBack, icon: const Icon(Icons.chevron_left), label: const Text('Kembali')),
-            const SizedBox(height: 14),
-            AspectRatio(aspectRatio: 1.18, child: Container(decoration: BoxDecoration(color: AppColors.panel, borderRadius: BorderRadius.circular(20), border: Border.all(color: AppColors.stroke)), child: item.image == null ? const Icon(Icons.image_outlined, color: AppColors.textSecondary, size: 54) : ClipRRect(borderRadius: BorderRadius.circular(20), child: Image.network('$apiBase${item.image}', fit: BoxFit.cover, errorBuilder: (_, __, ___) => const Icon(Icons.image_outlined, color: AppColors.textSecondary, size: 54))))),
-            const SizedBox(height: 28),
-            Text(item.name.toUpperCase(), style: const TextStyle(color: AppColors.textPrimary, fontSize: 34, fontWeight: FontWeight.w900, letterSpacing: 1)),
-            const SizedBox(height: 22),
-            DetailRow(label: 'ID Item', value: item.id),
-            DetailRow(label: 'Nama', value: item.name),
-            DetailRow(label: 'Tipe', value: titleCase(item.type)),
-            DetailRow(label: 'Stok', value: '${item.stock} Unit'),
-            DetailRow(label: 'Harga', value: formatRupiah(item.price)),
-            DetailRow(label: 'Rarity', child: RarityText(rarity: item.rarity)),
-            if (item.description.isNotEmpty) ...[const SizedBox(height: 18), Container(width: double.infinity, padding: const EdgeInsets.all(18), decoration: BoxDecoration(color: AppColors.input, borderRadius: BorderRadius.circular(14), border: Border.all(color: AppColors.stroke)), child: Text(item.description, style: const TextStyle(color: AppColors.textSecondary, height: 1.5)))],
-            if (!widget.adminMode) ...[
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextButton.icon(
+                onPressed: widget.onBack,
+                icon: const Icon(Icons.chevron_left),
+                label: const Text('Kembali'),
+              ),
+              const SizedBox(height: 14),
+              AspectRatio(
+                aspectRatio: 1.18,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.panel,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: AppColors.stroke),
+                  ),
+                  child: item.image == null
+                      ? const Icon(
+                          Icons.image_outlined,
+                          color: AppColors.textSecondary,
+                          size: 54,
+                        )
+                      : ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.network(
+                            '$apiBase${item.image}',
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => const Icon(
+                              Icons.image_outlined,
+                              color: AppColors.textSecondary,
+                              size: 54,
+                            ),
+                          ),
+                        ),
+                ),
+              ),
               const SizedBox(height: 28),
-              Row(children: [const Text('Jumlah', style: TextStyle(color: AppColors.textPrimary, fontSize: 18)), const SizedBox(width: 20), QuantityButton(icon: Icons.remove, onTap: () => setState(() => _quantity = (_quantity - 1).clamp(1, 999))), Padding(padding: const EdgeInsets.symmetric(horizontal: 18), child: Text('$_quantity', style: const TextStyle(color: AppColors.textPrimary, fontSize: 22, fontWeight: FontWeight.w800))), QuantityButton(icon: Icons.add, onTap: () => setState(() => _quantity++))]),
-              const SizedBox(height: 24),
-              PrimaryActionButton(text: 'TAMBAH KE KERANJANG (${formatRupiah(item.price * _quantity)})', loading: false, onPressed: () {}),
+              Text(
+                item.name.toUpperCase(),
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 34,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1,
+                ),
+              ),
+              const SizedBox(height: 22),
+              DetailRow(label: 'ID Item', value: item.id),
+              DetailRow(label: 'Nama', value: item.name),
+              DetailRow(label: 'Tipe', value: titleCase(item.type)),
+              DetailRow(label: 'Stok', value: '${item.stock} Unit'),
+              DetailRow(label: 'Harga', value: formatRupiah(item.price)),
+              DetailRow(
+                label: 'Rarity',
+                child: RarityText(rarity: item.rarity),
+              ),
+              if (item.description.isNotEmpty) ...[
+                const SizedBox(height: 18),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: AppColors.input,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: AppColors.stroke),
+                  ),
+                  child: Text(
+                    item.description,
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      height: 1.5,
+                    ),
+                  ),
+                ),
+              ],
+              if (!widget.adminMode) ...[
+                const SizedBox(height: 28),
+                Row(
+                  children: [
+                    const Text(
+                      'Jumlah',
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    QuantityButton(
+                      icon: Icons.remove,
+                      onTap: () => setState(
+                        () => _quantity = (_quantity - 1).clamp(1, 999),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 18),
+                      child: Text(
+                        '$_quantity',
+                        style: const TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                    QuantityButton(
+                      icon: Icons.add,
+                      onTap: () => setState(() => _quantity++),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                PrimaryActionButton(
+                  text:
+                      'TAMBAH KE KERANJANG (${formatRupiah(item.price * _quantity)})',
+                  loading: false,
+                  onPressed: () {},
+                ),
+              ],
             ],
-          ]),
+          ),
         ),
       ),
     );
@@ -62,7 +168,35 @@ class DetailRow extends StatelessWidget {
   final Widget? child;
 
   @override
-  Widget build(BuildContext context) => Padding(padding: const EdgeInsets.only(bottom: 13), child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [SizedBox(width: 96, child: Text('$label:', style: const TextStyle(color: AppColors.textSecondary, fontSize: 17))), Expanded(child: child ?? Text(value ?? '-', style: const TextStyle(color: AppColors.textPrimary, fontSize: 17)))]));
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(bottom: 13),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 96,
+          child: Text(
+            '$label:',
+            style: const TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 17,
+            ),
+          ),
+        ),
+        Expanded(
+          child:
+              child ??
+              Text(
+                value ?? '-',
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 17,
+                ),
+              ),
+        ),
+      ],
+    ),
+  );
 }
 
 class RarityText extends StatelessWidget {
@@ -72,8 +206,17 @@ class RarityText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = switch (rarity) { 5 => const Color(0xFFFFD65A), 4 => const Color(0xFFB889FF), 3 => const Color(0xFF55A9FF), 2 => const Color(0xFF55E087), _ => AppColors.textPrimary };
-    return Text('$rarity Star', style: TextStyle(color: color, fontSize: 17, fontWeight: FontWeight.w800));
+    final color = switch (rarity) {
+      5 => const Color(0xFFFFD65A),
+      4 => const Color(0xFFB889FF),
+      3 => const Color(0xFF55A9FF),
+      2 => const Color(0xFF55E087),
+      _ => AppColors.textPrimary,
+    };
+    return Text(
+      '$rarity Star',
+      style: TextStyle(color: color, fontSize: 17, fontWeight: FontWeight.w800),
+    );
   }
 }
 
@@ -84,5 +227,16 @@ class QuantityButton extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => InkWell(onTap: onTap, borderRadius: BorderRadius.circular(22), child: Container(width: 44, height: 44, decoration: BoxDecoration(borderRadius: BorderRadius.circular(22), border: Border.all(color: AppColors.stroke)), child: Icon(icon, color: AppColors.cyan)));
+  Widget build(BuildContext context) => InteractiveSurface(
+    onTap: onTap,
+    borderRadius: 22,
+    borderColor: AppColors.stroke,
+    hoverBorderColor: AppColors.cyan,
+    hoverColor: AppColors.cyan.withValues(alpha: 0.08),
+    child: SizedBox(
+      width: 44,
+      height: 44,
+      child: Icon(icon, color: AppColors.cyan),
+    ),
+  );
 }
