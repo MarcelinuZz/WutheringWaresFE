@@ -248,29 +248,7 @@ class HomePageState extends State<HomePage> {
               ],
               if (_tab == MainTab.catalog && !_isAdmin)
                 const SizedBox(height: 20),
-              Expanded(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 220),
-                  switchInCurve: Curves.easeOutCubic,
-                  switchOutCurve: Curves.easeInCubic,
-                  transitionBuilder: (child, animation) {
-                    final offset = Tween<Offset>(
-                      begin: const Offset(0.03, 0),
-                      end: Offset.zero,
-                    ).animate(animation);
-                    return FadeTransition(
-                      opacity: animation,
-                      child: SlideTransition(position: offset, child: child),
-                    );
-                  },
-                  child: KeyedSubtree(
-                    key: ValueKey(
-                      '${_isAdmin ? 'admin' : 'user'}-$_effectiveTab',
-                    ),
-                    child: _buildTab(),
-                  ),
-                ),
-              ),
+              Expanded(child: _buildTab()),
             ],
           ),
         ),
